@@ -19,9 +19,8 @@
      */
     static double [] insertionSort (double a[]){
 
-        //todo: implement the sort
         double temp;
-        for (int i = 1; i < a.length; i++) {
+        for(int i = 1; i < a.length; i++) {
             for(int j = i; j > 0; j--) {
                 if(a[j] < a[j-1]) {
                     temp = a[j];
@@ -42,8 +41,17 @@
      */
     static double [] selectionSort (double a[]){
 
-         //todo: implement the sort
-
+        int n = a.length;
+        for(int i = 0; i < n-1; i++) {
+            int min_idx = i;
+            for(int j = i+1; j < n; j++) {
+                if(a[j] < a[min_idx])
+                    min_idx = j;
+            }
+            double temp = a[min_idx];
+            a[min_idx] = a[i];
+            a[i] = temp;
+        }
     }//end selectionsort
 
     /**
