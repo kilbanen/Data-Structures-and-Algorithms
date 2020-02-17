@@ -18,7 +18,6 @@
      *
      */
     static double [] insertionSort (double a[]){
-
         double temp;
         for(int i = 1; i < a.length; i++) {
             for(int j = i; j > 0; j--) {
@@ -40,7 +39,6 @@
      *
      */
     static double [] selectionSort (double a[]){
-
         int n = a.length;
         for(int i = 0; i < n-1; i++) {
             int min_idx = i;
@@ -52,6 +50,7 @@
             a[min_idx] = a[i];
             a[i] = temp;
         }
+        return a;
     }//end selectionsort
 
     /**
@@ -65,7 +64,29 @@
 	
 		 //todo: implement the sort
 
+        return a;
     }//end quicksort
+
+    private int partition(Comparable<Object>[] numbers, int lo, int hi) {
+        int i = lo;
+        int j = hi+1;
+        Comparable<Object> pivot = numbers[lo];
+        while(true) {
+            while((numbers[++i].compareTo(pivot) < 0)) {
+                if(i == hi) break;
+            }
+            while((pivot.compareTo(numbers[--j]) < 0)) {
+                if(j == lo) break;
+            }
+            if(i >= j) break;
+            Comparable<Object> temp = numbers[i];
+            numbers[i] = numbers[j];
+            numbers[j] = temp;
+        }
+        numbers[lo] = numbers[j];
+        numbers[j] = pivot;
+        return j;
+    }
 
     /**
      * Sorts an array of doubles using Merge Sort.
@@ -86,6 +107,7 @@
 
 		 //todo: implement the sort
 	
+        return a;
     }//end mergesortIterative
     
     
@@ -102,6 +124,7 @@
 
     	//todo: implement the sort
 	
+        return a;
    }//end mergeSortRecursive
     	
     
