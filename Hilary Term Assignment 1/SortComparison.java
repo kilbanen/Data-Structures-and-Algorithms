@@ -61,8 +61,7 @@
      *
      */
     static double [] quickSort (double a[]){
-	
-		 //todo: implement the sort
+        if (a.length <= 10) return insertionSort(a);
         recursiveQuick(a, 0, a.length-1);
         return a;
     }//end quicksort
@@ -71,30 +70,24 @@
         if(hi <= lo) {
             return;
         }
-        int pivotPos = partition(numbers, lo, hi);
-        recursiveQuick(numbers, lo, pivotPos-1);
-        recursiveQuick(numbers, pivotPos+1, hi);
+        int lt = lo;
+        int gt = hi;
+        int pivotIndex = (int)(Math.random() * numbers.length);
+        double v = numbers[pivotIndex];
+        int i = lo;
+        while(i <= gt) {
+            if (numbers[i] < v) exchange(numbers, lt++, i++);
+            else if (numbers[i] > v) exchange(numbers, i, gt--);
+            else i++;
+        }
+        recursiveQuick(numbers, lo, lt-1);
+        recursiveQuick(numbers, gt+1, hi);
     }
 
-    static int partition(double[] numbers, int lo, int hi) {
-        int i = lo;
-        int j = hi+1;
-        double pivot = numbers[lo];
-        while(true) {
-            while((numbers[++i] < pivot)) {
-                if(i == hi) break;
-            }
-            while((pivot < numbers[--j])) {
-                if(j == lo) break;
-            }
-            if(i >= j) break;
-            double temp = numbers[i];
-            numbers[i] = numbers[j];
-            numbers[j] = temp;
-        }
-        numbers[lo] = numbers[j];
-        numbers[j] = pivot;
-        return j;
+    static void exchange(double[] numbers, int i, int j) {
+        double temp = numbers[i];
+        numbers[i] = numbers[j];
+        numbers[j] = temp;
     }
 
     /**
