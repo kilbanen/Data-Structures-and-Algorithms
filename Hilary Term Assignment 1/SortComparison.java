@@ -63,23 +63,32 @@
     static double [] quickSort (double a[]){
 	
 		 //todo: implement the sort
-
+        recursiveQuick(a, 0, a.length-1);
         return a;
     }//end quicksort
 
-    private int partition(Comparable<Object>[] numbers, int lo, int hi) {
+    static void recursiveQuick(double[] numbers, int lo, int hi) {
+        if(hi <= lo) {
+            return;
+        }
+        int pivotPos = partition(numbers, lo, hi);
+        recursiveQuick(numbers, lo, pivotPos-1);
+        recursiveQuick(numbers, pivotPos+1, hi);
+    }
+
+    static int partition(double[] numbers, int lo, int hi) {
         int i = lo;
         int j = hi+1;
-        Comparable<Object> pivot = numbers[lo];
+        double pivot = numbers[lo];
         while(true) {
-            while((numbers[++i].compareTo(pivot) < 0)) {
+            while((numbers[++i] < pivot)) {
                 if(i == hi) break;
             }
-            while((pivot.compareTo(numbers[--j]) < 0)) {
+            while((pivot < numbers[--j])) {
                 if(j == lo) break;
             }
             if(i >= j) break;
-            Comparable<Object> temp = numbers[i];
+            double temp = numbers[i];
             numbers[i] = numbers[j];
             numbers[j] = temp;
         }
