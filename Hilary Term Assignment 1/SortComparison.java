@@ -122,19 +122,33 @@
      * @return after the method returns, the array must be in ascending sorted order.
      */
     static double[] mergeSortRecursive (double a[]) {
-    	
-
-    	//todo: implement the sort
-	
+        double[] aux = new double[a.length];
+        mergeSortRecursive(a, aux, 0, a.length - 1);
         return a;
    }//end mergeSortRecursive
+
+    static void mergeSortRecursive (double[] a, double[] aux, int lo, int hi) {
+        if (hi <= lo) return;
+        int mid = lo + (hi - lo) / 2;
+        mergeSortRecursive(a, aux, lo, mid);
+        mergeSortRecursive(a, aux, mid+1, hi);
+        merge(a, aux, lo, mid, hi);
+    }
+
+    static void merge (double[] a, double[] aux, int lo, int mid, int hi)
+    {
+        for(int k = lo; k <= hi; k++)
+            aux[k] = a[k];
+
+        int i = lo, j = mid+1;
+        for(int k = lo; k <= hi; k++) {
+            if (i > mid)              a[k] = aux[j++];
+            else if (j > hi)          a[k] = aux[i++];
+            else if (aux[j] < aux[i]) a[k] = aux[j++];
+            else                      a[k] = aux[i++];
+        }
+    }
     	
-    
-
-
-   
-
-
     public static void main(String[] args) {
 
         //todo: do experiments as per assignment instructions
