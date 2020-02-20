@@ -106,9 +106,11 @@
      */
 
     static double[] mergeSortIterative (double a[]) {
-
-		 //todo: implement the sort
-	
+        int n = a.length;
+        double[] aux = new double[n];
+        for(int sz = 1; sz < n; sz = sz+sz)
+            for(int lo = 0; lo < n - sz; lo += sz+sz)	
+                merge(a, aux, lo, lo+sz-1, Math.min(lo+sz+sz-1, n-1));
         return a;
     }//end mergesortIterative
     
