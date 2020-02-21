@@ -72,8 +72,7 @@
         }
         int lt = lo;
         int gt = hi;
-        int pivotIndex = (int)(Math.random() * numbers.length);
-        double v = numbers[pivotIndex];
+        double v = numbers[hi];
         int i = lo;
         while(i <= gt) {
             if (numbers[i] < v) exchange(numbers, lt++, i++);
@@ -120,7 +119,7 @@
      * Sorts an array of doubles using recursive implementation of Merge Sort.
      * This method is static, thus it can be called as SortComparison.sort(a)
      *
-     * @param a: An unsorted array of doubles.
+    * @param a: An unsorted array of doubles.
      * @return after the method returns, the array must be in ascending sorted order.
      */
     static double[] mergeSortRecursive (double a[]) {
