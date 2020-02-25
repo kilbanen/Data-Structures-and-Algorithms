@@ -8,6 +8,8 @@
  *  @version HT 2020
  */
 
+import java.io.*;
+
  class SortComparison {
 
     /**
@@ -149,10 +151,69 @@
             else                      a[k] = aux[i++];
         }
     }
-    	
+
     public static void main(String[] args) {
 
         //todo: do experiments as per assignment instructions
+        long startTime = 0, endTime = 0, duration;
+        String[] inputFiles = { "numbers10.txt", "numbers100.txt", 
+                                "numbers1000.txt", "numbers1000Duplicates.txt", 
+                                "numbersNearlyOrdered1000.txt", "numbersReverse1000.txt", 
+                                "numbersSorted1000.txt" };
+        int[] fileSizes = { 10, 100, 1000, 1000, 1000, 1000, 1000 };
+        String fileName = inputFiles[0];
+        File file = new File(fileName);
+        double[] a = {}, insertionSort, selectionSort, quickSort, mergeSortIterative,
+                                                                mergeSortRecursive;
+        for(int i = 0; i < inputFiles.length; i++) {
+                fileName = inputFiles[i];
+                file = new File(fileName);
+                try{
+                        FileReader fileReader = new FileReader(file);
+                        BufferedReader bufferedReader = new BufferedReader(fileReader);
+                        a = new double[fileSizes[i]];
+                        for(int j = 0; j < a.length; j++)
+                                a[j] = Double.parseDouble(bufferedReader.readLine());
+                        bufferedReader.close();
+                        startTime = System.nanoTime();
+                        insertionSort = insertionSort(a);
+                        endTime = System.nanoTime();
+                        duration = endTime - startTime;
+                        System.out.println("Insertion Sort on " + fileName + " took " + 
+                                                                        duration + "ns");
+                        startTime = System.nanoTime();
+                        selectionSort = selectionSort(a);
+                        endTime = System.nanoTime();
+                        duration = endTime - startTime;
+                        System.out.println("Selection Sort on " + fileName + " took " + 
+                                                                        duration + "ns");
+                        startTime = System.nanoTime();
+                        quickSort = quickSort(a);
+                        endTime = System.nanoTime();
+                        duration = endTime - startTime;
+                        System.out.println("Quick Sort on " + fileName + " took " + 
+                                                                        duration + "ns");
+                        startTime = System.nanoTime();
+                        mergeSortIterative = mergeSortIterative(a);
+                        endTime = System.nanoTime();
+                        duration = endTime - startTime;
+                        System.out.println("Iterative Merge Sort on " + fileName + 
+                                                        " took " + duration + "ns");
+                        startTime = System.nanoTime();
+                        mergeSortRecursive = mergeSortRecursive(a);
+                        endTime = System.nanoTime();
+                        duration = endTime - startTime;
+                        System.out.println("Recursive Merge Sort on " + fileName + 
+                                                        " took " + duration + "ns");
+                }
+                catch(FileNotFoundException ex) {
+                        System.out.println("Unable to open file '" + fileName + "'");
+                }
+                catch(IOException ex) {
+                        System.out.println("Error reading file '" + fileName + "'");
+                }
+
+        }
     }
 
  }//end class
