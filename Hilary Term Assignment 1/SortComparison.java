@@ -6,6 +6,7 @@
  *
  *  @author Neil Kilbane 18322169
  *  @version HT 2020
+ *
  */
 
 import java.io.*;
@@ -20,18 +21,15 @@ import java.io.*;
      *
      */
     static double [] insertionSort (double a[]){
-        double temp;
-        for(int i = 1; i < a.length; i++) {
-            for(int j = i; j > 0; j--) {
-                if(a[j] < a[j-1]) {
-                    temp = a[j];
-                    a[j] = a[j-1];
-                    a[j-1] = temp;
-                }
-            }
-        }
-        return a;
+        return insertionSort(a, 0, a.length-1);
     }//end insertionsort
+
+    static double[] insertionSort(double a[], int lo, int hi) {
+        for(int i = lo+1; i < hi; i++) 
+            for(int j = i; j > lo; j--)
+                if(a[j] < a[j-1]) a = exchange(a, i, j);
+        return a;
+    }
 	
 	    /**
      * Sorts an array of doubles using Selection Sort.
@@ -41,16 +39,12 @@ import java.io.*;
      *
      */
     static double [] selectionSort (double a[]){
-        int n = a.length;
-        for(int i = 0; i < n-1; i++) {
-            int min_idx = i;
-            for(int j = i+1; j < n; j++) {
-                if(a[j] < a[min_idx])
-                    min_idx = j;
-            }
-            double temp = a[min_idx];
-            a[min_idx] = a[i];
-            a[i] = temp;
+        int min_idx;
+        for(int i = 0; i < a.length-1; i++) {
+            min_idx = i;
+            for(int j = i+1; j < a.length; j++)
+                if(a[j] < a[min_idx]) min_idx = j;
+            a = exchange(a, i, min_idx);
         }
         return a;
     }//end selectionsort
@@ -63,32 +57,31 @@ import java.io.*;
      *
      */
     static double [] quickSort (double a[]){
-        if (a.length <= 10) return insertionSort(a);
-        recursiveQuick(a, 0, a.length-1);
-        return a;
+        return quickSort(a, 0, a.length-1);
     }//end quicksort
 
-    static void recursiveQuick(double[] numbers, int lo, int hi) {
-        if(hi <= lo) {
-            return;
-        }
+    static double[] quickSort(double[] a, int lo, int hi) {
+        if(hi <= lo) return a;
+        if(hi - lo + 1 <= 10) return insertionSort(a, lo, hi); 
         int lt = lo;
         int gt = hi;
-        double v = numbers[hi];
+        double v = a[hi];
         int i = lo;
         while(i <= gt) {
-            if (numbers[i] < v) exchange(numbers, lt++, i++);
-            else if (numbers[i] > v) exchange(numbers, i, gt--);
+            if (a[i] < v) exchange(a, lt++, i++);
+            else if (a[i] > v) exchange(a, i, gt--);
             else i++;
         }
-        recursiveQuick(numbers, lo, lt-1);
-        recursiveQuick(numbers, gt+1, hi);
+        a = quickSort(a, lo, lt-1);
+        a = quickSort(a, gt+1, hi);
+        return a;
     }
 
-    static void exchange(double[] numbers, int i, int j) {
+    static double[] exchange(double[] numbers, int i, int j) {
         double temp = numbers[i];
         numbers[i] = numbers[j];
         numbers[j] = temp;
+        return numbers;
     }
 
     /**
@@ -155,65 +148,6 @@ import java.io.*;
     public static void main(String[] args) {
 
         //todo: do experiments as per assignment instructions
-        long startTime = 0, endTime = 0, duration;
-        String[] inputFiles = { "numbers10.txt", "numbers100.txt", 
-                                "numbers1000.txt", "numbers1000Duplicates.txt", 
-                                "numbersNearlyOrdered1000.txt", "numbersReverse1000.txt", 
-                                "numbersSorted1000.txt" };
-        int[] fileSizes = { 10, 100, 1000, 1000, 1000, 1000, 1000 };
-        String fileName = inputFiles[0];
-        File file = new File(fileName);
-        double[] a = {}, insertionSort, selectionSort, quickSort, mergeSortIterative,
-                                                                mergeSortRecursive;
-        for(int i = 0; i < inputFiles.length; i++) {
-                fileName = inputFiles[i];
-                file = new File(fileName);
-                try{
-                        FileReader fileReader = new FileReader(file);
-                        BufferedReader bufferedReader = new BufferedReader(fileReader);
-                        a = new double[fileSizes[i]];
-                        for(int j = 0; j < a.length; j++)
-                                a[j] = Double.parseDouble(bufferedReader.readLine());
-                        bufferedReader.close();
-                        startTime = System.nanoTime();
-                        insertionSort = insertionSort(a);
-                        endTime = System.nanoTime();
-                        duration = endTime - startTime;
-                        System.out.println("Insertion Sort on " + fileName + " took " + 
-                                                                        duration + "ns");
-                        startTime = System.nanoTime();
-                        selectionSort = selectionSort(a);
-                        endTime = System.nanoTime();
-                        duration = endTime - startTime;
-                        System.out.println("Selection Sort on " + fileName + " took " + 
-                                                                        duration + "ns");
-                        startTime = System.nanoTime();
-                        quickSort = quickSort(a);
-                        endTime = System.nanoTime();
-                        duration = endTime - startTime;
-                        System.out.println("Quick Sort on " + fileName + " took " + 
-                                                                        duration + "ns");
-                        startTime = System.nanoTime();
-                        mergeSortIterative = mergeSortIterative(a);
-                        endTime = System.nanoTime();
-                        duration = endTime - startTime;
-                        System.out.println("Iterative Merge Sort on " + fileName + 
-                                                        " took " + duration + "ns");
-                        startTime = System.nanoTime();
-                        mergeSortRecursive = mergeSortRecursive(a);
-                        endTime = System.nanoTime();
-                        duration = endTime - startTime;
-                        System.out.println("Recursive Merge Sort on " + fileName + 
-                                                        " took " + duration + "ns");
-                }
-                catch(FileNotFoundException ex) {
-                        System.out.println("Unable to open file '" + fileName + "'");
-                }
-                catch(IOException ex) {
-                        System.out.println("Error reading file '" + fileName + "'");
-                }
-
-        }
     }
 
  }//end class
