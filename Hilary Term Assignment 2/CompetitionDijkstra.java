@@ -19,8 +19,8 @@ import java.io.*;
 import java.lang.*;
 
 public class CompetitionDijkstra {
-  int sA, sB, sC, numberOfIntersections, numberOfStreets;
-  Intersection[] city;
+  int sA, sB, sC, N, S;
+  HashMap<Integer, HashMap<Integer, Double>> graph;
 
     /**
      * @param filename: A filename containing the details of the city road network
@@ -34,117 +34,27 @@ public class CompetitionDijkstra {
       File file = new File(filename);
       try{
         Scanner scanner = new Scanner(file);
-        this.numberOfIntersections = scanner.nextInt();
-        this.numberOfStreets = scanner.nextInt();
-        this.city = new Intersection[numberOfIntersections];
+        N = scanner.nextInt();
+        S = scanner.nextInt();
+        graph = new HashMap<Integer, HashMap<Integer, Double>>();
         
-        for(int i = 0; i < numberOfIntersections; i++) {
-          this.city[i] = new Intersection();
-        }
+        int v;
+        int w;
+        double weight;
         
-        Street street;
-        int from;
-        int to;
-        double length;
-        
-        for(int i = 0; i < numberOfStreets; i++) {
-          from = scanner.nextInt();
-          to = scanner.nextInt();
-          length = scanner.nextDouble();
-          street = new Street(from, to, length);
-          this.city[from].addStreet(street);
+        for(int i = 0; i < S; i++) {
+          v = scanner.nextInt();
+          w = scanner.nextInt();
+          weight = scanner.nextDouble();
+          if(graph.get(v) == null)
+            graph.put(v, new HashMap<Integer, Double>());
+          graph.get(v).put(w, weight);
         }
 
         scanner.close();
       } catch (FileNotFoundException e) {
         System.err.println("FileNotFoundException caught!");
         e.printStackTrace();
-      }
-    }
-
-    class Street {
-      int from, to;
-      double length;
-
-      Street(int from, int to, double length) {
-        this.from = from;
-        this.to = to;
-        this.length = length;
-      }
-    }
-
-    class Intersection {
-      ArrayList<Street> streets;
-      int numberOfStreets;
-
-      Intersection() {
-        this.streets = new ArrayList<Street>();
-        numberOfStreets = 0;
-      }
-
-      void addStreet(Street street) {
-        this.streets.add(street);
-        numberOfStreets++;
-      }
-      
-      Street getStreet(int index) {
-        return streets.get(index);
-      }
-    }
-
-    class SPT {
-      int source;
-      double[] distTo;
-      Street[] streetTo;
-      boolean[] intersectionsVisited;
-
-      SPT(int source, Intersection[] city) {
-        this.source = source;
-        int size = city.length;
-        distTo = new double[size];
-        streetTo = new Street[size];
-        intersectionsVisited = new boolean[size];
-
-        for(int i = 0; i < size; i++) {
-          if(i == source)
-            distTo[i] = 0;
-          else
-            distTo[i] = Integer.MAX_VALUE; 
-          intersectionsVisited[i] = false;
-        }
-
-        int closestIntersectionIndex;
-        Intersection closestIntersection;
-        for(int i = 0; i < size; i++) {
-          closestIntersectionIndex = closestIntersectionFromSource();
-          closestIntersection = city[closestIntersectionIndex];
-          for(Street street : closestIntersection.streets) {
-            relaxStreet(street);
-          }
-          intersectionsVisited[closestIntersectionIndex] = true;
-        }
-      }
-
-      void relaxStreet(Street street) {
-        int from = street.from;
-        int to = street.to;
-        if(distTo[to] > distTo[from] + street.length) {
-          distTo[to] = distTo[from] + street.length;
-          streetTo[to] = street;
-        }
-        
-      }
-
-      int closestIntersectionFromSource() {
-        double distance = Integer.MAX_VALUE;
-        int index = -1;
-        for(int i = 0; i < distTo.length; i++) {
-          if(distTo[i] < distance && intersectionsVisited[i] == false) {
-            distance = distTo[i];
-            index = i;
-          }
-        }
-        return index;
       }
     }
 
@@ -158,21 +68,68 @@ public class CompetitionDijkstra {
       // I then need to search through all of the shortest paths and find the longest one
       // I will then divide the length of the longest shortest path by the slowest walking speed
 
-      SPT[] shortestPathTrees = new SPT[numberOfIntersections];
+      if(sA < 50 || sB < 50 || sC < 50 || sA > 100 || sB > 100 || sC > 100)
+        return -1;
+
+      double[] distTo = new double[N];
+      int[] edgeTo = new int[N];
       double longestShortestPath = 0;
-      for(int i = 0; i < numberOfIntersections; i++) {
-        shortestPathTrees[i] = new SPT(i, city);
-        for(int j = 0; j < numberOfIntersections; j++) {
-          if(shortestPathTrees[i].distTo[j] > longestShortestPath)
-            longestShortestPath = shortestPathTrees[i].distTo[j];
+
+      for(Integer source : graph.keySet()) {
+        dijkstra(source, distTo, edgeTo);
+        for(int i = 0; i < N; i++) {
+          if(edgeTo[i] == -1)
+            return -1;
+          if(longestShortestPath < distTo[i])
+            longestShortestPath = distTo[i];
         }
       }
+      
       int slowestSpeed = sA;
-      if (sB < slowestSpeed) slowestSpeed = sB;
-      if (sC < slowestSpeed) slowestSpeed = sC;
-      double timeRequiredDouble = longestShortestPath * 1000 / slowestSpeed;
-      int timeRequiredInt = (int)Math.ceil(timeRequiredDouble);
-      return timeRequiredInt;
+      if(slowestSpeed > sB) slowestSpeed = sB;
+      if(slowestSpeed > sC) slowestSpeed = sC;
+
+      double duration = longestShortestPath * 1000 / slowestSpeed;
+      int roundedDuration = (int)Math.ceil(duration);
+
+      return roundedDuration;
+    }
+
+    public void dijkstra(int source, double[] distTo, int[] edgeTo) {
+      ArrayList<Integer> unvisitedNodes = new ArrayList<Integer>();
+      distTo = new double[N];
+      edgeTo = new int[N];
+      
+      for(int i = 0; i < N; i++) {
+        distTo[i] = Integer.MAX_VALUE;
+        edgeTo[i] = -1;
+        unvisitedNodes.add(i);
+      }
+      distTo[source] = 0;
+
+      int min = source;
+      double minDist;
+      int v;
+      while(min != -1) {
+        v = min;
+        for(Integer w : graph.get(v).keySet()) {
+          if(unvisitedNodes.contains(w) && distTo[v] != Integer.MAX_VALUE && distTo[w] > distTo[v] + graph.get(v).get(w)) {
+            distTo[w] = distTo[v] + graph.get(v).get(w);
+            edgeTo[w] = v;
+          }
+        }
+        unvisitedNodes.remove(unvisitedNodes.indexOf(v));
+
+        min = -1;
+        minDist = Integer.MAX_VALUE;
+        for(Integer w : unvisitedNodes) {
+          if(minDist >= distTo[w]) {
+            minDist = distTo[w];
+            min = w;
+          }
+        }
+      }
+      
     }
 
     
