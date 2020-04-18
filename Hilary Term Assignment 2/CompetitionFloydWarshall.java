@@ -41,6 +41,7 @@ public class CompetitionFloydWarshall {
       graph = new double[N][N];
       for(int i = 0; i < N; i++) {
         for(int j = 0; j < N; j++) {
+          if(i == j) graph[i][j] = 0;
           graph[i][j] = INFINITY;
         }
       }
@@ -65,9 +66,44 @@ public class CompetitionFloydWarshall {
    * @return int: minimum minutes that will pass before the three contestants can meet
    */
   public int timeRequiredforCompetition(){
-
-      //TO DO
+    if(sA < 50 || sB < 50 || sC < 50 || sA > 100 || sB > 100 || sC > 100)
       return -1;
+
+    int slowestSpeed = sA;
+    if(slowestSpeed > sB) slowestSpeed = sB;
+    if(slowestSpeed > sC) slowestSpeed = sC;
+
+    double[][] d = new double[N][N];
+    double longestShortestPath = 0;
+    for(int i = 0; i < N; i++) {
+      for(int j = 0; j < N; j++) {
+        d[i][j] = graph[i][j];
+      }
+    }
+    
+    for(int k = 0; k < N; k++) {
+      for(int i = 0; i < N; i++) {
+        for(int j = 0; j < N; j++) {
+          if(d[i][k] + d[k][j] < d[i][j])
+            d[i][j] = d[i][k] + d[k][j];
+        }
+      }
+    }
+
+    for(int i = 0; i < N; i++) {
+      for(int j = 0; j < N; j++) {
+        if(d[i][j] > longestShortestPath)
+          longestShortestPath = d[i][j];
+      }
+    }
+
+    if(longestShortestPath > INFINITY)
+      return -1;
+
+    double duration = longestShortestPath * 1000 / slowestSpeed;
+    int roundedDuration = (int)Math.ceil(duration);
+
+    return roundedDuration;
   }
 
 }
